@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #333333;
+            --card-bg: #3d464d;
+            --text-main: #ffffff;
+            --accent-color: #d4e157;
+            --normal-color: #888888;
+            --sidebar-width: 80px;
+        }
+
+        body {
+            margin: 0;
+            background-color: #4a4a4a;
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+        }
+
+        /* --- サイドバー：歯車を上に上げる修正 --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 0 30px; /* 下のパディングを大きくして歯車を上に移動 */
+            position: fixed;
+            z-index: 100;
+            box-sizing: border-box; /* パディングを含めて100vhに収める */
+        }
+
+        .nav-icons, .nav-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .sidebar a {
+            font-size: 24px;
+            color: #333;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar a.active {
+            border-left: 4px solid #000;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* --- メインコンテンツ --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .status-section {
+            background-color: var(--bg-dark);
+            border-radius: 30px;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 24px;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .status-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 150px;
+        }
+
+        .status-card h3 {
+            margin: 0 0 15px 0;
+            font-weight: normal;
+            font-size: 18px;
+        }
+
+        .status-info {
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .timeline-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+        }
+
+        .time-range, .weather-info, .impact-info {
+            color: var(--accent-color);
+        }
+
+        /* --- テーマ切り替えの設定 --- */
+
+/* Whiteモード: 明るいグレーと白 */
+body.White {
+    --bg-dark: #f0f0f0;
+    --card-bg: #ffffff;
+    --panel-bg: #ffffff;
+    --text-main: #333333;
+    --accent-color: #2c3e50;
+    --normal-color: #999999;
+}
+
+/* Woodモード: 温かみのある茶系 */
+body.Wood {
+    --bg-dark: #5d4037;
+    --card-bg: #8d6e63;
+    --panel-bg: #795548;
+    --text-main: #fff3e0;
+    --accent-color: #ffe082;
+    --normal-color: #d7ccc8;
+}
+
+/* bodyの背景色を変数にするよう修正 */
+body {
+    margin: 0;
+    background-color: var(--bg-dark); /* 固定色から変数に変更 */
+    color: var(--text-main);
+    transition: background-color 0.3s, color 0.3s; /* 切り替えを滑らかに */
+}
+    </style>
+</head>
+<body th:class="${mode}">
+
+    <nav class="sidebar">
+        <div class="nav-icons">
+            <a th:href="@{/}" class="nav-item">🏠</a>
+            <a th:href="@{/stats}" class="nav-item">📊</a>
+            <a th:href="@{/train}" class="nav-item active">🚆</a>
+        </div>
+        
+        <div class="nav-bottom">
+            <a th:href="@{/settings}" class="nav-item">⚙️</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="status-section">
+            <span class="section-title">Operation Status</span>
+            
+            <div class="status-grid">
+                <th:block th:each="line : ${troubledLines}">
+                    <div class="status-card">
+                        <h3 th:text="${line.category}">Category</h3>
+                        <div class="status-info">
+                            <span th:text="${line.status}" th:style="'color:' + ${line.statusColor}">Status</span>
+                            <span th:text="${line.lineName}" th:style="'color:' + ${line.statusColor}">Line Name</span>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <span class="section-title">Time Line</span>
+            
+            <div th:each="item : ${timeline}" class="timeline-row">
+                <span class="time-range" th:text="${item.time}">06:00</span>
+                <span class="weather-info" th:text="${item.condition}">CLOUDY</span>
+                <span class="impact-info" th:text="${item.impact}">:Train ○ :AirLine ○</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
