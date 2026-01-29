@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Stats</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root { background: #3e3e3e; color: #fff; font-family: monospace; margin: 0;}
+    
+    /* サイドバー設定 */
+    .sidebar {
+      width: 80px; height: 100vh; background: #f0f0f0; display: flex; flex-direction: column;
+      justify-content: space-between; align-items: center; padding: 20px 0;
+      position: fixed; left: 0; top: 0; box-sizing: border-box; z-index: 100;
+    }
+
+    .nav-item {
+      text-decoration: none; font-size: 1.8em; transition: 0.2s;
+      cursor: pointer; display: flex; justify-content: center; align-items: center;
+      width: 100%; height: 60px;
+    }
+
+    .nav-item.active {
+  
+  padding-left: 4px;
+  background-color: rgba(0,0,0,0.02);
+}
+
+    /* メインコンテンツ */
+    .main-content { margin-left: 80px; padding: 40px; flex: 1; }
+    
+    /* グラフカードのデザイン */
+    .chart-card { 
+      background: #4a4a4a; 
+      border-radius: 24px; 
+      padding: 25px; 
+      margin-bottom: 30px; /* カード同士の間隔 */
+    }
+    
+    h2 { margin-top: 0; font-size: 1.2rem; color: #ddd; }
+    
+    /* グラフの高さを調整 */
+    .chart-container { position: relative; height: 300px; width: 100%; }
+
+    /* --- テーマ切り替えの設定 --- */
+
+/* Whiteモード: 明るいグレーと白 */
+body.White {
+    --bg-dark: #f0f0f0;
+    --card-bg: #ffffff;
+    --panel-bg: #ffffff;
+    --text-main: #333333;
+    --accent-color: #2c3e50;
+    --normal-color: #999999;
+}
+
+/* Woodモード: 温かみのある茶系 */
+body.Wood {
+    --bg-dark: #5d4037;
+    --card-bg: #8d6e63;
+    --panel-bg: #795548;
+    --text-main: #fff3e0;
+    --accent-color: #ffe082;
+    --normal-color: #d7ccc8;
+}
+
+/* bodyの背景色を変数にするよう修正 */
+body {
+    margin: 0;
+    background-color: var(--bg-dark); /* 固定色から変数に変更 */
+    color: var(--text-main);
+    display: flex;
+    transition: background-color 0.3s, color 0.3s; /* 切り替えを滑らかに */
+
+}
+  </style>
+</head>
+<body th:class="${mode}">
+  <nav class="sidebar">
+    <div class="nav-icons">
+      <a th:href="@{/}" class="nav-item">🏠</a>
+      <a th:href="@{/stats}" class="nav-item active">📊</a>
+      <a href="/train" class="nav-item">🚆</a>
+    </div>
+    <div class="nav-bottom">
+      <a href="/settings" class="nav-item">⚙️</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <h1>Weather Statistics</h1>
+    
+    <div class="chart-card">
+      <h2>Chance of rain (%)</h2>
+      <div class="chart-container">
+        <canvas id="rainChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h2>Temperature (℃)</h2>
+      <div class="chart-container">
+        <canvas id="tempChart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <script th:inline="javascript">
+    const hourlyData = /*[[${hourlyList}]]*/ [];
+    const labels = hourlyData.map(item => item.time);
+    
+    // データ抽出
+    const rainPopData = hourlyData.map(item => item.pop);
+    const tempData = hourlyData.map(item => item.temperature); // ※Java側が temperature の場合は item.temperature に変更
+
+    // 共通のスケール設定（見た目を統一するため）
+    const commonScales = {
+      y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+      x: { ticks: { color: '#aaa' }, grid: { display: false } }
+    };
+
+    // --- 降水確率（棒グラフ） ---
+    new Chart(document.getElementById('rainChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: rainPopData,
+          backgroundColor: '#77b2cc',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { ...commonScales, y: { ...commonScales.y, beginAtZero: true, max: 100 } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // --- 気温（折れ線グラフ） ---
+    new Chart(document.getElementById('tempChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: tempData,
+          borderColor: '#ffab91',       // オレンジ色
+          backgroundColor: 'rgba(255, 171, 145, 0.2)',
+          fill: true,                   // 線の下を塗りつぶす
+          tension: 0.4,                 // カーブを滑らかにする
+          pointBackgroundColor: '#ffab91',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: commonScales,
+        plugins: { legend: { display: false } }
+      }
+    });
+</script>
+</body>
+</html>
