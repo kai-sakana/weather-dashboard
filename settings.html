@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -14,12 +15,18 @@
             --sidebar-width: 80px;
         }
 
+        /* テーマ設定 */
+        body.White { --bg-dark: #f0f0f0; --panel-bg: #ffffff; --text-main: #333333; }
+        body.Wood { --bg-dark: #5d4037; --panel-bg: #795548; --text-main: #fff3e0; }
+        body.Dark { --bg-dark: #4a4a4a; --panel-bg: #3d464d; --text-main: #ffffff; }
+
         body {
             margin: 0;
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Share Tech Mono', 'Segoe UI', monospace;
             display: flex;
+            transition: all 0.3s ease;
         }
 
         /* --- サイドバー --- */
@@ -46,14 +53,10 @@
             justify-content: center;
             align-items: center;
             text-decoration: none;
-            /* ここで線を消しています */
             border-left: 4px solid transparent;
         }
 
-        /* 設定ページでもサイドバーの黒い線を不要とする場合は、以下をコメントアウトまたは削除 */
-        .sidebar a.active {
-            border-left: 4px solid transparent; /* 黒い線を透明に修正 */
-        }
+        .sidebar a.active { border-left: 4px solid #000; background-color: rgba(0,0,0,0.05); }
 
         /* --- メインコンテンツ --- */
         .main-content {
@@ -76,64 +79,19 @@
             max-width: 800px;
             min-height: 500px;
             position: relative;
+            transition: background-color 0.3s;
         }
 
-        .settings-header {
-            font-size: 32px;
-            margin-bottom: 60px; /* 余白を広げて見やすく */
-        }
+        .settings-header { font-size: 32px; margin-bottom: 60px; }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .settings-column { border-left: 1px solid #888; padding-left: 50px; display: flex; flex-direction: column; align-items: flex-start; }
+        .settings-column:first-child { border-left: none; }
+        .column-title { font-size: 24px; margin-bottom: 25px; display: block; width: 100%; }
 
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
+        .option-list { list-style: none; padding: 0; margin: 0; }
+        .option-item { margin-bottom: 18px; display: flex; align-items: center; gap: 15px; font-size: 20px; cursor: pointer; }
+        .option-item input[type="radio"] { width: 20px; height: 20px; margin: 0; cursor: pointer; }
 
-        .settings-column {
-            border-left: 1px solid #888;
-            /* AreaとModeで開始位置を揃えるため一律のパディングを設定 */
-            padding-left: 50px; 
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .settings-column:first-child {
-            border-left: none;
-        }
-
-        .column-title {
-            font-size: 24px;
-            margin-bottom: 25px;
-            /* タイトルも左揃えにしてチェック位置とラインを合わせる */
-            display: block;
-            width: 100%;
-        }
-
-        /* --- ラジオボタンのリスト --- */
-        .option-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .option-item {
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .option-item input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        /* --- 決定ボタン --- */
         .decide-button {
             position: absolute;
             bottom: 40px;
@@ -148,52 +106,19 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
-
-        .decide-button:hover {
-            opacity: 0.8;
-        }
-
-        /* --- テーマ切り替えの設定 --- */
-
-/* Whiteモード: 明るいグレーと白 */
-body.White {
-    --bg-dark: #f0f0f0;
-    --card-bg: #ffffff;
-    --panel-bg: #ffffff;
-    --text-main: #333333;
-    --accent-color: #2c3e50;
-    --normal-color: #999999;
-}
-
-/* Woodモード: 温かみのある茶系 */
-body.Wood {
-    --bg-dark: #5d4037;
-    --card-bg: #8d6e63;
-    --panel-bg: #795548;
-    --text-main: #fff3e0;
-    --accent-color: #ffe082;
-    --normal-color: #d7ccc8;
-}
-
-/* bodyの背景色を変数にするよう修正 */
-body {
-    margin: 0;
-    background-color: var(--bg-dark); /* 固定色から変数に変更 */
-    color: var(--text-main);
-    transition: background-color 0.3s, color 0.3s; /* 切り替えを滑らかに */
-}
+        .decide-button:hover { opacity: 0.8; }
     </style>
 </head>
-<body th:class="${mode}">
+<body id="body-tag">
 
     <nav class="sidebar">
         <div class="nav-icons">
-            <a th:href="@{/index}" class="nav-item">🏠</a>
-            <a th:href="@{/stats}" class="nav-item">📊</a>
-            <a th:href="@{/train}" class="nav-item">🚆</a>
+            <a href="index.html" class="nav-item">🏠</a>
+            <a href="stats.html" class="nav-item">📊</a>
+            <a href="train.html" class="nav-item">🚆</a>
         </div>
         <div class="nav-bottom">
-            <a th:href="@{/settings}" class="nav-item active">⚙️</a>
+            <a href="settings.html" class="nav-item active">⚙️</a>
         </div>
     </nav>
 
@@ -201,42 +126,41 @@ body {
         <div class="settings-panel">
             <div class="settings-header">Settings</div>
 
-            <form th:action="@{/settings/save}" method="post">
-                <div class="settings-grid">
-                    <div class="settings-column">
-                        <span class="column-title">Area</span>
-                        <div class="option-list">
-                            <label class="option-item">
-                                <input type="radio" name="area" value="Tokyo" th:checked="${currentArea == 'Tokyo'}"> Tokyo
-                            </label>
-                            <label class="option-item">
-                                <input type="radio" name="area" value="Osaka" th:checked="${currentArea == 'Osaka'}"> Osaka
-                            </label>
-                        </div>
+            <div class="settings-grid">
+                <div class="settings-column">
+                    <span class="column-title">Area</span>
+                    <div class="option-list">
+                        <label class="option-item"><input type="radio" name="area" value="Tokyo" checked> Tokyo</label>
+                        <label class="option-item"><input type="radio" name="area" value="Osaka"> Osaka</label>
                     </div>
-
-                    <div class="settings-column">
-                        <span class="column-title">Mode</span>
-                        <div class="option-list">
-                            <label class="option-item">
-                                <input type="radio" name="mode" value="Dark" th:checked="${currentMode == 'Dark'}"> Dark
-                            </label>
-                            <label class="option-item">
-                                <input type="radio" name="mode" value="White" th:checked="${currentMode == 'White'}"> White
-                            </label>
-                            <label class="option-item">
-                                <input type="radio" name="mode" value="Wood" th:checked="${currentMode == 'Wood'}"> Wood
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="settings-column"></div>
                 </div>
 
-                <button type="submit" class="decide-button">decide</button>
-            </form>
+                <div class="settings-column">
+                    <span class="column-title">Mode</span>
+                    <div class="option-list">
+                        <label class="option-item"><input type="radio" name="mode" value="Dark" checked> Dark</label>
+                        <label class="option-item"><input type="radio" name="mode" value="White"> White</label>
+                        <label class="option-item"><input type="radio" name="mode" value="Wood"> Wood</label>
+                    </div>
+                </div>
+                <div class="settings-column"></div>
+            </div>
+
+            <button type="button" class="decide-button" onclick="applySettings()">decide</button>
         </div>
     </div>
 
+    <script>
+        function applySettings() {
+            // ラジオボタンで選択されたモードを取得
+            const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+            
+            // bodyのクラスを書き換えてテーマを適用
+            const body = document.getElementById('body-tag');
+            body.className = selectedMode;
+
+            alert('Setting applied: ' + selectedMode + ' mode');
+        }
+    </script>
 </body>
 </html>
