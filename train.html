@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Train Status</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -16,13 +17,14 @@
 
         body {
             margin: 0;
-            background-color: #4a4a4a;
+            background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- サイドバー：歯車を上に上げる修正 --- */
+        /* --- サイドバー --- */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -31,10 +33,10 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 40px 0 30px; /* 下のパディングを大きくして歯車を上に移動 */
+            padding: 40px 0 30px;
             position: fixed;
             z-index: 100;
-            box-sizing: border-box; /* パディングを含めて100vhに収める */
+            box-sizing: border-box;
         }
 
         .nav-icons, .nav-bottom {
@@ -73,7 +75,7 @@
         }
 
         .status-section {
-            background-color: var(--bg-dark);
+            background-color: rgba(0,0,0,0.2);
             border-radius: 30px;
             padding: 30px;
         }
@@ -123,78 +125,79 @@
             color: var(--accent-color);
         }
 
-        /* --- テーマ切り替えの設定 --- */
-
-/* Whiteモード: 明るいグレーと白 */
-body.White {
-    --bg-dark: #f0f0f0;
-    --card-bg: #ffffff;
-    --panel-bg: #ffffff;
-    --text-main: #333333;
-    --accent-color: #2c3e50;
-    --normal-color: #999999;
-}
-
-/* Woodモード: 温かみのある茶系 */
-body.Wood {
-    --bg-dark: #5d4037;
-    --card-bg: #8d6e63;
-    --panel-bg: #795548;
-    --text-main: #fff3e0;
-    --accent-color: #ffe082;
-    --normal-color: #d7ccc8;
-}
-
-/* bodyの背景色を変数にするよう修正 */
-body {
-    margin: 0;
-    background-color: var(--bg-dark); /* 固定色から変数に変更 */
-    color: var(--text-main);
-    transition: background-color 0.3s, color 0.3s; /* 切り替えを滑らかに */
-}
+        /* テーマ設定 */
+        body.White { --bg-dark: #f0f0f0; --card-bg: #ffffff; --text-main: #333333; --accent-color: #2c3e50; }
+        body.Wood { --bg-dark: #5d4037; --card-bg: #8d6e63; --text-main: #fff3e0; --accent-color: #ffe082; }
     </style>
 </head>
-<body th:class="${mode}">
+<body>
 
     <nav class="sidebar">
         <div class="nav-icons">
-            <a th:href="@{/index}" class="nav-item">🏠</a>
-            <a th:href="@{/stats}" class="nav-item">📊</a>
-            <a th:href="@{/train}" class="nav-item active">🚆</a>
+            <a href="index.html" class="nav-item">🏠</a>
+            <a href="stats.html" class="nav-item">📊</a>
+            <a href="train.html" class="nav-item active">🚆</a>
         </div>
-        
         <div class="nav-bottom">
-            <a th:href="@{/settings}" class="nav-item">⚙️</a>
+            <a href="settings.html" class="nav-item">⚙️</a>
         </div>
     </nav>
 
     <div class="main-content">
         <div class="status-section">
             <span class="section-title">Operation Status</span>
-            
-            <div class="status-grid">
-                <th:block th:each="line : ${troubledLines}">
-                    <div class="status-card">
-                        <h3 th:text="${line.category}">Category</h3>
-                        <div class="status-info">
-                            <span th:text="${line.status}" th:style="'color:' + ${line.statusColor}">Status</span>
-                            <span th:text="${line.lineName}" th:style="'color:' + ${line.statusColor}">Line Name</span>
-                        </div>
-                    </div>
-                </th:block>
-            </div>
+            <div class="status-grid" id="status-grid">
+                </div>
         </div>
 
         <div class="status-section">
             <span class="section-title">Time Line</span>
-            
-            <div th:each="item : ${timeline}" class="timeline-row">
-                <span class="time-range" th:text="${item.time}">06:00</span>
-                <span class="weather-info" th:text="${item.condition}">CLOUDY</span>
-                <span class="impact-info" th:text="${item.impact}">:Train ○ :AirLine ○</span>
-            </div>
+            <div id="timeline-container">
+                </div>
         </div>
     </div>
+
+    <script>
+        // 電車運行状況のダミーデータ
+        const troubledLines = [
+            { category: 'JR East', status: 'Normal', lineName: 'Yamanote Line', color: '#d4e157' },
+            { category: 'Subway', status: 'Delay', lineName: 'Chiyoda Line', color: '#ff6b6b' },
+            { category: 'JR East', status: 'Normal', lineName: 'Chuo Line', color: '#d4e157' }
+        ];
+
+        // タイムラインのダミーデータ
+        const timelineData = [
+            { time: '06:00', condition: 'CLOUDY', impact: ':Train ○ :AirLine ○' },
+            { time: '09:00', condition: 'RAIN', impact: ':Train △ :AirLine ○' },
+            { time: '12:00', condition: 'RAIN', impact: ':Train △ :AirLine △' }
+        ];
+
+        // 運行状況の表示
+        const grid = document.getElementById('status-grid');
+        troubledLines.forEach(line => {
+            grid.innerHTML += `
+                <div class="status-card">
+                    <h3>${line.category}</h3>
+                    <div class="status-info">
+                        <span style="color: ${line.color}">${line.status}</span>
+                        <span style="color: ${line.color}">${line.lineName}</span>
+                    </div>
+                </div>`;
+        });
+
+        // タイムラインの表示
+        const timeline = document.getElementById('timeline-container');
+        timelineData.forEach(item => {
+            timeline.innerHTML += `
+                <div class="timeline-row">
+                    <span class="time-range">${item.time}</span>
+                    <span class="weather-info">${item.condition}</span>
+                    <span class="impact-info">${item.impact}</span>
+                </div>`;
+        });
+    </script>
+</body>
+</html>
 
 </body>
 </html>
