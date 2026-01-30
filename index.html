@@ -1,151 +1,47 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather Dashboard</title>
   <style>
+    /* 元のスタイルをそのまま維持 */
     :root {
       --bg-dark:#3e3e3e;
-  --card-bg:#4a4a4a;
-  --panel-bg:#2f4b55;
-  --text-main:#fff;
+      --card-bg:#4a4a4a;
+      --panel-bg:#2f4b55;
+      --text-main:#fff;
       font-family: monospace;
-      
     }
-
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+    }
     h1 { margin-left: 10px; font-size: 2.2em; }
-
-    /* 全体レイアウト */
-    .dashboard-wrapper {
-      display: flex;
-      gap: 25px;
-      align-items: stretch; /* 高さを揃える */
-    }
-
-    /* --- 左カラム：Today + Hourly --- */
-    .left-column {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      flex: 2; /* 左側の比率 */
-      min-width: 450px;
-    }
-
-    /* --- 右カラム全体 --- */
-    .right-column-container {
-      display: flex;
-      gap: 25px;
-      flex: 3; /* 右側の比率（左より少し広く） */
-    }
-
-    /* 右カラムの中の「予報・Sun列」（縦並び） */
-    .forecast-sun-column {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      flex: 1; /* 幅の比率 */
-    }
-
-    /* 右カラムの中の「ハイライト列」 */
-    .highlight-column {
-      flex: 1.5; /* こちらを少し広く */
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* --- 各カードのデザイン --- */
-    
-    /* 黒系背景のカード（Today, Hourly, Forecast, Sun） */
-    .card, .hourly-container, .forecast-side, .sun-card {
-      background: #4a4a4a;
-      border-radius: 24px;
-      box-sizing: border-box;
-    }
-
-    /* 青緑系背景のカード（Highlightのみ） */
-    .highlight-side {
-      background: #2f4b55;
-      border-radius: 24px;
-      padding: 30px;
-      height: 100%; /* 高さを親に合わせる */
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Todayカード */
-    .card {
-      padding: 55px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Hourlyカード */
-    .hourly-container {
-      padding: 30px 20px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    /* Forecastカード */
-    .forecast-side {
-      padding: 20px;
-      flex: 1; /* 縦に伸びる */
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
-
-    /* Sunカード */
-    .sun-card {
-      padding: 20px;
-      flex: 0.8; /* Forecastより少し小さめ */
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
-
-    /* --- ハイライトの正方形グリッド設定 --- */
-    .highlight-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr; /* 2列 */
-      gap: 20px; /* カード間の隙間 */
-      margin: auto 0;
-    }
-
-    .highlight-item {
-      background: rgba(0,0,0,0.2);
-      border-radius: 24px;
-      padding: 10px;
-      text-align: center;
-      
-      /* ★ここが重要：正方形にする設定 */
-      aspect-ratio: 1 / 1; 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* --- フォント・アイコン等の詳細設定 --- */
+    .dashboard-wrapper { display: flex; gap: 25px; align-items: stretch; }
+    .left-column { display: flex; flex-direction: column; gap: 25px; flex: 2; min-width: 450px; }
+    .right-column-container { display: flex; gap: 25px; flex: 3; }
+    .forecast-sun-column { display: flex; flex-direction: column; gap: 25px; flex: 1; }
+    .highlight-column { flex: 1.5; display: flex; flex-direction: column; }
+    .card, .hourly-container, .forecast-side, .sun-card { background: #4a4a4a; border-radius: 24px; box-sizing: border-box; }
+    .highlight-side { background: #2f4b55; border-radius: 24px; padding: 30px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; }
+    .card { padding: 55px; display: flex; justify-content: space-between; align-items: center; }
+    .hourly-container { padding: 30px 20px; display: flex; justify-content: space-around; align-items: center; }
+    .forecast-side { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+    .sun-card { padding: 20px; flex: 0.8; display: flex; flex-direction: column; justify-content: space-around; }
+    .highlight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: auto 0; }
+    .highlight-item { background: rgba(0,0,0,0.2); border-radius: 24px; padding: 10px; text-align: center; aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .forecast-item { text-align: center; padding: 5px 0; border-bottom: 1px solid #5a5a5a; }
     .forecast-item:last-child { border-bottom: none; }
-    
-    .sun-item { text-align: center; }
     .sun-label { font-size: 0.75em; color: #aaa; margin-bottom: 4px; letter-spacing: 1px; }
     .sun-value { font-size: 1.3em; font-weight: bold; }
-
     .highlight-label { font-size: 0.7em; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-    .highlight-value { font-size: 1.8em; font-weight: bold; } /* 数字を少し大きく */
-    
+    .highlight-value { font-size: 1.8em; font-weight: bold; }
     .hourly-item { text-align: center; min-width: 60px; }
     .hourly-time { font-size: 1.1em; color: #ccc; margin-bottom: 8px; }
     .hourly-temp { font-weight: bold; font-size: 1.4em; margin-top: 8px; }
     .h-icon-large { font-size: 2.5em; display: block; }
-
     .info-item { margin-bottom: 10px; font-size: 1.1em; color: #ccc; }
     .temp-display { font-size: 4.5em; font-weight: bold; }
     .weather-icon { font-size: 6em; line-height: 1; }
@@ -153,95 +49,22 @@
     .day-name { font-size: 0.8em; color: #aaa; text-transform: uppercase; }
     .warning { color: #ff6b6b; font-weight: bold; }
     .highlight-title { text-align: center; margin-bottom: 25px; font-size: 1.3em; letter-spacing: 1px; }
-
-    .sidebar {
-  width: 80px;
-  height: 100vh;
-  background: #f0f0f0; /* グレーの背景 */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30px 0;
-  position: fixed; /* 左側に固定 */
-  left: 0;
-  top: 0;
-  box-sizing: border-box;
-}
-
-/* メインコンテンツをサイドバーの分だけ右にずらす */
-.main-content {
-  margin-left: 80px; /* サイドバーの幅と同じ */
-  flex: 1;
-  padding: 40px;
-}
-
-/* ナビゲーションアイコンの設定 */
-.nav-icons, .nav-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.nav-item {
-  text-decoration: none;
-  font-size: 1.8em;
-  transition: transform 0.2s, color 0.2s;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  color: #000;
-  transform: scale(1.1);
-}
-
-.nav-item.active {
-  
-  padding-left: 4px;
-  background-color: rgba(0,0,0,0.02);
-}
-
-/* --- テーマ切り替えの設定 --- */
-
-/* Whiteモード: 明るいグレーと白 */
-body.White {
-    --bg-dark: #f0f0f0;
-    --card-bg: #ffffff;
-    --panel-bg: #ffffff;
-    --text-main: #96b6ff;
-    --accent-color: #2c3e50;
-    --normal-color: #999999;
-}
-
-/* Woodモード: 温かみのある茶系 */
-body.Wood {
-    --bg-dark: #5d4037;
-    --card-bg: #8d6e63;
-    --panel-bg: #795548;
-    --text-main: #fff3e0;
-    --accent-color: #ffe082;
-    --normal-color: #d7ccc8;
-}
-
-/* bodyの背景色を変数にするよう修正 */
-body {
-    margin: 0;
-    background-color: var(--bg-dark); /* 固定色から変数に変更 */
-    color: var(--text-main);
-    transition: background-color 0.3s, color 0.3s; /* 切り替えを滑らかに */
-}
-
+    .sidebar { width: 80px; height: 100vh; background: #f0f0f0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 30px 0; position: fixed; left: 0; top: 0; box-sizing: border-box; }
+    .main-content { margin-left: 80px; flex: 1; padding: 40px; }
+    .nav-icons, .nav-bottom { display: flex; flex-direction: column; gap: 30px; }
+    .nav-item { text-decoration: none; font-size: 1.8em; transition: transform 0.2s, color 0.2s; cursor: pointer; color: #555;}
+    .nav-item:hover { color: #000; transform: scale(1.1); }
   </style>
 </head>
-<body th:class="${mode}">
+<body>
   <nav class="sidebar">
     <div class="nav-icons">
-      <a href="/index" class="nav-item active">🏠</a>
-      <a href="/stats" class="nav-item">📊</a>
-      <a href="/train" class="nav-item">🚆</a>
+      <a href="index.html" class="nav-item active">🏠</a>
+      <a href="stats.html" class="nav-item">📊</a>
+      <a href="train.html" class="nav-item">🚆</a>
     </div>
     <div class="nav-bottom">
-      <a href="/settings" class="nav-item">⚙️</a>
+      <a href="settings.html" class="nav-item">⚙️</a>
     </div>
   </nav>
 
@@ -249,70 +72,33 @@ body {
     <h1>Weather Dashboard</h1>
 
     <div class="dashboard-wrapper">
-      
       <div class="left-column">
         <div class="card">
           <div class="today-left">
-            <div class="info-item">Date: <span th:text="${today.date}"></span></div>
-            <div class="info-item">Time: <span th:text="${today.time}"></span></div>
-            <div class="info-item" style="margin-top: 15px;">Train: 
-                <span th:if="${today.trainDelayRisk}" class="warning">⚠️ Delay</span>
-                <span th:unless="${today.trainDelayRisk}">✅ Normal</span>
-            </div>
-            <div class="temp-display"><span th:text="${today.temperature}"></span>℃</div>
+            <div class="info-item">Date: <span>2026-01-30</span></div>
+            <div class="info-item">Time: <span>14:00</span></div>
+            <div class="info-item" style="margin-top: 15px;">Train: <span class="warning">⚠️ Delay</span></div>
+            <div class="temp-display">12℃</div>
           </div>
           <div class="today-right" style="text-align: center;">
-            <div class="weather-icon">
-              <span th:if="${today.weatherType.name() == 'SUNNY'}">☀️</span>
-              <span th:if="${today.weatherType.name() == 'CLOUDY'}">☁️</span>
-              <span th:if="${today.weatherType.name() == 'RAIN'}">🌧️</span>
-              <span th:if="${today.weatherType.name() == 'SNOW'}">❄️</span>
-            </div>
-            <div class="weather-text" th:text="${today.weatherType}"></div>
+            <div class="weather-icon">☀️</div>
+            <div class="weather-text">SUNNY</div>
           </div>
         </div>
 
-        <div class="hourly-container">
-          <div th:each="hour : ${hourlyList}" class="hourly-item">
-              <div class="hourly-time" th:text="${hour.time}"></div>
-              <div class="h-icon-large">
-                  <span th:if="${hour.weatherType.name() == 'SUNNY'}">☀️</span>
-                  <span th:if="${hour.weatherType.name() == 'CLOUDY'}">☁️</span>
-                  <span th:if="${hour.weatherType.name() == 'RAIN'}">🌧️</span>
-                  <span th:if="${hour.weatherType.name() == 'SNOW'}">❄️</span> 
-              </div>
-              <div class="hourly-temp"><span th:text="${hour.temperature}"></span>°</div>
+        <div class="hourly-container" id="hourly-list">
           </div>
-        </div>
       </div>
 
       <div class="right-column-container">
         <div class="forecast-sun-column">
-          <div class="forecast-side">
-            <div th:each="forecast : ${forecastList}" class="forecast-item">
-              <div class="day-name" th:text="${forecast.dayOfWeek}"></div>
-              <div style="font-size: 2em; margin: 2px 0;">
-                <span th:if="${forecast.weatherType.name() == 'SUNNY'}">☀️</span>
-                <span th:if="${forecast.weatherType.name() == 'CLOUDY'}">☁️</span>
-                <span th:if="${forecast.weatherType.name() == 'RAIN'}">🌧️</span>
-                <span th:if="${forecast.weatherType.name() == 'SNOW'}">❄️</span> <span th:unless="${forecast.weatherType.name() == 'SUNNY' OR forecast.weatherType.name() == 'CLOUDY' OR forecast.weatherType.name() == 'RAIN' OR forecast.weatherType.name() == 'SNOW'}"th:text="${forecast.weatherType}" style="font-size: 0.5em;"></span>
-              </div>
+          <div class="forecast-side" id="forecast-list">
             </div>
-          </div>
 
           <div class="sun-card">
-            <div class="sun-item">
-              <div class="sun-label">Sunrise</div>
-              <div class="sun-value" th:text="${sun.sunrise}"></div>
-            </div>
-            <div class="sun-item">
-              <div class="sun-label">Sunset</div>
-              <div class="sun-value" th:text="${sun.sunset}"></div>
-            </div>
-            <div class="sun-item">
-              <div class="sun-label">Length of day</div>
-              <div class="sun-value" th:text="${sun.dayLength}"></div>
-            </div>
+            <div class="sun-item"><div class="sun-label">Sunrise</div><div class="sun-value">06:45</div></div>
+            <div class="sun-item"><div class="sun-label">Sunset</div><div class="sun-value">17:10</div></div>
+            <div class="sun-item"><div class="sun-label">Length of day</div><div class="sun-value">10h 25m</div></div>
           </div>
         </div>
 
@@ -320,25 +106,4 @@ body {
           <div class="highlight-side">
             <h2 class="highlight-title">Today Highlight</h2>
             <div class="highlight-grid">
-              <div class="highlight-item">
-                <div class="highlight-label">chance of rain</div>
-                <div class="highlight-value"><span th:text="${highlight.chanceOfRain}"></span>%</div>
-              </div>
-              <div class="highlight-item">
-                <div class="highlight-label">UV index</div>
-                <div class="highlight-value" th:text="${highlight.uvIndex}"></div>
-              </div>
-              <div class="highlight-item">
-                <div class="highlight-label">wind</div>
-                <div class="highlight-value"><span th:text="${highlight.windSpeed}"></span><span style="font-size:0.5em">m/s</span></div>
-              </div>
-              <div class="highlight-item">
-                <div class="highlight-label">humidity</div>
-                <div class="highlight-value"><span th:text="${highlight.humidity}"></span>%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div> </main> </body>
+              <div class="highlight-item"><div class="highlight-label">chance of rain</div><div class="highlight-value">1
